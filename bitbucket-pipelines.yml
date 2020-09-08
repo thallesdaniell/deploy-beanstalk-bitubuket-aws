@@ -1,0 +1,24 @@
+image: atlassian/default-image:2
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Deploy to beanstalk
+          script:
+            - zip application.zip -r * .[^.]* -x *.git*
+            - pipe: atlassian/aws-elasticbeanstalk-deploy:0.5.0
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                APPLICATION_NAME: $APPLICATION_NAME
+                ENVIRONMENT_NAME: $APPLICATION_ENVIRONMENT_WEB
+                #COMMAND: "upload-only"
+                S3_BUCKET: "deploy-demo"
+                ZIP_FILE: "application.zip"
+                DESCRIPTION: '$BITBUCKET_BRANCH $APPLICATION_ENVIRONMENT_WEB ${BITBUCKET_COMMIT:0:8}-$BITBUCKET_BUILD_NUMBER'
+                # VERSION_LABEL: '<string>' # Optional.
+                # DESCRIPTION: '<string>' # Optional.
+                # WAIT: '<boolean>' # Optional.
+                # WAIT_INTERVAL: '<integer>' # Optional.
+                # DEBUG: '<boolean>' # Optional.
